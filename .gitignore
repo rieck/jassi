@@ -1,17 +1,37 @@
-# Object files
-*.o
-
-# Libraries
-*.lib
 *.a
-
-# Shared objects (inc. Windows DLLs)
+*.app
 *.dll
+*.dylib
+*.exe
+*.la
+*.lib
+*.lo
+*.o
+*.out
 *.so
 *.so.*
-*.dylib
-
-# Executables
-*.exe
-*.out
-*.app
+.DS_Store
+.dep.inc
+.deps
+.libs
+CHANGES
+Makefile
+Makefile-jassi.mk
+Makefile.in
+a.out.dSYM/
+aclocal.m4
+autom4te.cache
+build
+config.*
+configure
+depcomp
+install-sh
+jassi-*.tar.gz
+libtool
+ltmain.sh
+m4
+missing
+src/jassi
+src/jslex.c
+stamp-h1
+ylwrap
