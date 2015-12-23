@@ -1,6 +1,6 @@
 %{
 
-/* 
+/*
  * jassi - A Simple and Robust JavaScript Lexer
  * Copyright 2011 (c) Konrad Rieck (konrad@mlsec.org)
  */
@@ -18,10 +18,13 @@
 #undef ECHO
 #define ECHO {}
 
+extern int show_str;
+extern int show_num;
+extern int show_id;
+
 static void yyerror(char *);
 static void yycomment(char *);
 static void append(char *);
-static char buf[5];
 static char *queue = NULL;
 static int qlen = 0;
 static int qalloc = 0;
@@ -84,8 +87,8 @@ STRING			"\""("\\\""|[^"\""])*"\""|"'"("\\'"|[^"'"])*"'"
 
 "break"			{ append("BREAK "); }
 "case" 			{ append("CASE "); }
-"catch"			{ append("CATCH "); } 
-"const"			{ append("CONST "); } 
+"catch"			{ append("CATCH "); }
+"const"			{ append("CONST "); }
 "continue"		{ append("CONTINUE "); }
 "debugger"		{ append("DEBUGGER "); }
 "default"		{ append("DEFAULT "); }
@@ -115,9 +118,28 @@ STRING			"\""("\\\""|[^"\""])*"\""|"'"("\\'"|[^"'"])*"'"
 "while"			{ append("WHILE "); }
 "with"			{ append("WITH "); }
 
-{NUMBER}		{ append("NUM "); }
-{IDENTIFIER}		{ append("ID "); }
-{STRING}		{ append("STR."); snprintf(buf, sizeof(buf), "%.3ld ", (long) yyleng / 10); append(buf); }
+{NUMBER}		{
+    if (show_num) {
+        append(yytext); append(" ");
+    } else {
+        append("NUM ");
+    }
+}
+{IDENTIFIER}		{
+    if (show_id) {
+        append(yytext); append(" ");
+    } else {
+        append("ID ");
+    }
+}
+
+{STRING}		{
+    if (show_str) {
+        append(yytext); append(" ");
+    } else {
+        append("STR ");
+    }
+}
 
 "/*"	   		yycomment("*/");
 "//".*\n   		;
@@ -132,18 +154,18 @@ char *jslex_string(char *x)
     queue = NULL;
     qalloc = 0;
     qlen = 0;
-    
+
     /* Set intput and lex */
-    yy_scan_string(x);  
-    yylex(); 
-    
+    yy_scan_string(x);
+    yylex();
+
     return queue;
 }
 
 /*
  * Comment function called by lexer
  */
-void yycomment(char *mat) 
+void yycomment(char *mat)
 {
     int c;
     char *cp;
@@ -159,18 +181,18 @@ void yycomment(char *mat)
             if (c == *cp)
       	    cp++;
         }
-    } 
-} 
+    }
+}
 
 /*
  * Error function called by lexer
- */ 
+ */
 void yyerror(char *s)
 {
     fatal("%s\n", s);
-} 
+}
 
-/* 
+/*
  * Append function called by lexer
  */
 void append(char *token)
@@ -181,10 +203,10 @@ void append(char *token)
     if (queue == NULL || qlen + n + 1 > qalloc) {
         qalloc += 4096;
         queue = realloc(queue, qalloc * sizeof(char));
-        if (!queue) 
+        if (!queue)
             fatal("Could not realloc lexer buffer");
-    } 
-       
+    }
+
     strcpy(queue + qlen, token);
     qlen += strlen(token);
 }

@@ -10,6 +10,10 @@
 #include "jslex.h"
 #include "util.h"
 
+int show_str = 1;
+int show_num = 1;
+int show_id = 0;
+
 /**
  * Main function of Lexer
  * @param argc Number of arguments
